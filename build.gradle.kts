@@ -1,6 +1,8 @@
 plugins {
     kotlin("jvm") version "1.9.0"
+    id("org.jetbrains.dokka") version "1.9.0"
     `java-library`
+    `maven-publish`
 }
 
 group = "io.github.seggan"
@@ -29,4 +31,12 @@ kotlin {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }

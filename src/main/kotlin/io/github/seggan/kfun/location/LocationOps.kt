@@ -2,6 +2,7 @@ package io.github.seggan.kfun.location
 
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import org.bukkit.Location
+import org.bukkit.block.Block
 
 operator fun Location.component1(): Double = x
 operator fun Location.component2(): Double = y
@@ -20,4 +21,7 @@ operator fun Location.div(factor: Double): Location = this.clone().multiply(1 / 
 operator fun Location.divAssign(factor: Double) { this.multiply(1 / factor) }
 
 val Location.position: BlockPosition
+    get() = BlockPosition(this)
+
+val Block.position: BlockPosition
     get() = BlockPosition(this)
