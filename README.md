@@ -1,4 +1,4 @@
-#sf4k
+# sf4k
 
 sf4k is a library for Kotlin that provides a useful base and utilities for writing 
 [Slimefun](https://github.com/Slimefun/Slimefun4) addons. [Docs](https://seggan.github.io/sf4k/).
