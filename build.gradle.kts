@@ -2,11 +2,13 @@ plugins {
     kotlin("jvm") version "1.9.22"
     id("org.jetbrains.dokka") version "1.9.0"
     `java-library`
-    `maven-publish`
+    signing
+    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
 }
 
 group = "io.github.seggan"
-version = "1.0-SNAPSHOT"
+version = "0.1.0"
+description = "A simple library for creating Slimefun addons in Kotlin."
 
 repositories {
     mavenCentral()
@@ -33,12 +35,35 @@ kotlin {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+
+    withSourcesJar()
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
+signing {
+    useGpgCmd()
+}
+
+centralPortal {
+    pom {
+        url = "https://github.com/Seggan/sf4k"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                name = "Seggan"
+                email = "seggan21@gmail.com"
+                organization = "N/A"
+                organizationUrl = "https://github.com/Seggan"
+            }
+        }
+        scm {
+            connection = "scm:git:git://github.com/Seggan/sf4k.git"
+            developerConnection = "scm:git:ssh://github.com:Seggan/sf4k.git"
+            url = "https://github.com/Seggan/sf4k"
         }
     }
 }

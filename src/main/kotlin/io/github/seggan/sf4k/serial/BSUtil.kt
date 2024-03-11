@@ -1,4 +1,4 @@
-package io.github.seggan.kfun.serial
+package io.github.seggan.sf4k.serial
 
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import org.bukkit.Location

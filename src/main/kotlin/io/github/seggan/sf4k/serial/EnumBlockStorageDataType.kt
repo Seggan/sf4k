@@ -1,4 +1,4 @@
-package io.github.seggan.kfun.serial
+package io.github.seggan.sf4k.serial
 
 import kotlin.reflect.KClass
 

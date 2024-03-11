@@ -1,4 +1,4 @@
-package io.github.seggan.kfun;
+package io.github.seggan.sf4k;
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;

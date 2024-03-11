@@ -1,6 +1,4 @@
-package io.github.seggan.kfun.serial
-
-import io.github.seggan.kfun.serial.BlockStorageDataType
+package io.github.seggan.sf4k.serial
 
 abstract class CollectionBlockStorageDataType<E, C : Collection<E>>(
     private val contentSerializer: BlockStorageDataType<E>

@@ -1,4 +1,4 @@
-package io.github.seggan.kfun.location
+package io.github.seggan.sf4k.location
 
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import org.bukkit.Location
