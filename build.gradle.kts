@@ -17,7 +17,7 @@ repositories {
 dependencies {
     compileOnlyApi("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     compileOnlyApi("com.github.Slimefun:Slimefun4:RC-36")
-    api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.14.0")
+    api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.14.0")
     testImplementation(kotlin("test"))
 }
 
