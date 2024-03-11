@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.22"
     id("org.jetbrains.dokka") version "1.9.0"
     `java-library`
     `maven-publish`
@@ -17,6 +17,7 @@ repositories {
 dependencies {
     compileOnlyApi("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     compileOnlyApi("com.github.Slimefun:Slimefun4:RC-36")
+    api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.14.0")
     testImplementation(kotlin("test"))
 }
 
