@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.seggan"
-version = "0.1.0"
+version = "0.1.1"
 description = "A simple library for creating Slimefun addons in Kotlin."
 
 repositories {
@@ -43,6 +43,10 @@ signing {
     useGpgCmd()
 }
 
+tasks.publish {
+    dependsOn(tasks.clean)
+}
+
 centralPortal {
     pom {
         url = "https://github.com/Seggan/sf4k"
@@ -64,6 +68,16 @@ centralPortal {
             connection = "scm:git:git://github.com/Seggan/sf4k.git"
             developerConnection = "scm:git:ssh://github.com:Seggan/sf4k.git"
             url = "https://github.com/Seggan/sf4k"
+        }
+        // whyyyy
+        withXml {
+            val depsNode = asNode().appendNode("dependencies")
+            for (dep in project.configurations.getByName("api").dependencies) {
+                val depNode = depsNode.appendNode("dependency")
+                depNode.appendNode("groupId", dep.group)
+                depNode.appendNode("artifactId", dep.name)
+                depNode.appendNode("version", dep.version)
+            }
         }
     }
 }
