@@ -4,6 +4,12 @@ import be.seeseemelk.mockbukkit.MockBukkit
 import be.seeseemelk.mockbukkit.ServerMock
 import io.github.seggan.sf4k.serial.pdc.get
 import io.github.seggan.sf4k.serial.pdc.set
+import io.github.seggan.sf4k.serial.serializers.LocationSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.serializer
+import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -39,15 +45,18 @@ class TestPDCSerial {
         TestObject("a", 1, null).invariantUnderSerialization()
         listOf(TestObject("a", 1, "c"), TestObject("a", 1, null)).invariantUnderSerialization()
         mapOf("a" to TestObject("a", 1, "c"), "b" to TestObject("a", 1, null)).invariantUnderSerialization()
+
+        val world = server.addSimpleWorld("world")
+        Location(world, 0.0, 0.0, 0.0).invariantUnderSerialization(LocationSerializer)
     }
 
-    private inline fun < reified T> T.invariantUnderSerialization() {
+    private inline fun <reified T> T.invariantUnderSerialization(serializer: KSerializer<T> = serializer()) {
         val player = server.addPlayer()
         val testPlugin = MockBukkit.createMockPlugin()
         val key = NamespacedKey(testPlugin, "test")
         val pdc = player.persistentDataContainer
-        pdc.set(key, this)
-        val decoded: T = pdc.get(key)!!
+        pdc.set(key, this, serializer)
+        val decoded: T = pdc.get(key, serializer)!!
         assertEquals(this, decoded)
         server.pluginManager.disablePlugin(testPlugin)
         server.setPlayers(0)
