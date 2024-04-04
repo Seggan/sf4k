@@ -1,13 +1,14 @@
 plugins {
     kotlin("jvm") version "1.9.22"
     id("org.jetbrains.dokka") version "1.9.0"
+    kotlin("plugin.serialization") version "1.9.22"
     `java-library`
     signing
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
 }
 
 group = "io.github.seggan"
-version = "0.1.1"
+version = "0.2.0"
 description = "A simple library for creating Slimefun addons in Kotlin."
 
 repositories {
@@ -21,6 +22,7 @@ dependencies {
     compileOnlyApi("com.github.Slimefun:Slimefun4:RC-36")
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.14.0")
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.14.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
     testImplementation(kotlin("test"))
 }
 
