@@ -1,22 +1,39 @@
 package io.github.seggan.sf4k.serial.blockstorage
 
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.serializer
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import org.bukkit.Location
 import org.bukkit.block.Block
 
-inline fun <reified T> Location.getBlockStorage(key: String): T? {
+inline fun <reified T> Location.getBlockStorage(
+    key: String,
+    strategy: DeserializationStrategy<T> = serializer()
+): T? {
     val encoded = BlockStorage.getLocationInfo(this, key)
-    return BlockStorageDecoder.decode<T>(encoded)
+    return BlockStorageDecoder.decode(strategy, encoded)
 }
 
-inline fun <reified T> Block.getBlockStorage(key: String): T? = location.getBlockStorage(key)
+inline fun <reified T> Block.getBlockStorage(
+    key: String,
+    strategy: DeserializationStrategy<T> = serializer()
+): T? = location.getBlockStorage(key, strategy)
 
-inline fun <reified T> Location.setBlockStorage(key: String, value: T) {
-    val encoded = BlockStorageEncoder.encode<T>(value)
+inline fun <reified T> Location.setBlockStorage(
+    key: String,
+    value: T,
+    strategy: SerializationStrategy<T> = serializer()
+) {
+    val encoded = BlockStorageEncoder.encode(strategy, value)
     BlockStorage.addBlockInfo(this, key, encoded)
 }
 
-inline fun <reified T> Block.setBlockStorage(key: String, value: T) = location.setBlockStorage(key, value)
+inline fun <reified T> Block.setBlockStorage(
+    key: String,
+    value: T,
+    strategy: SerializationStrategy<T> = serializer()
+) = location.setBlockStorage(key, value, strategy)
 
 private const val BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 

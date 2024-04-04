@@ -1,17 +1,22 @@
 package io.github.seggan.sf4k.serial.pdc
 
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.EmptySerializersModule
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
+import java.util.WeakHashMap
 
-class PersistentDataEncoder @PublishedApi internal constructor(
+@OptIn(ExperimentalSerializationApi::class)
+class PersistentDataEncoder internal constructor(
     private val plugin: Plugin,
     private val context: PersistentDataAdapterContext,
     internal val key: NamespacedKey,
@@ -41,7 +46,7 @@ class PersistentDataEncoder @PublishedApi internal constructor(
     }
 
     override fun encodeEnum(enumDescriptor: SerialDescriptor, index: Int) {
-        container.set(key, PersistentDataType.STRING, enumDescriptor.getElementName(index))
+        container.set(key, PersistentDataType.INTEGER, index)
     }
 
     override fun encodeFloat(value: Float) {
@@ -71,5 +76,32 @@ class PersistentDataEncoder @PublishedApi internal constructor(
 
     override fun encodeString(value: String) {
         container.set(key, PersistentDataType.STRING, value)
+    }
+
+    companion object {
+
+        private val pluginCache = WeakHashMap<NamespacedKey, Plugin>()
+
+        fun <T> encode(
+            strategy: SerializationStrategy<T>,
+            key: NamespacedKey,
+            value: T,
+            container: PersistentDataContainer
+        ) {
+            val encoder = PersistentDataEncoder(
+                pluginCache.getOrPut(key) {
+                    Bukkit.getPluginManager().plugins.find {
+                        it.name.equals(
+                            key.namespace,
+                            ignoreCase = true
+                        )
+                    } ?: throw SerializationException("No plugin found for namespace ${key.namespace}")
+                },
+                container.adapterContext,
+                key,
+                container
+            )
+            encoder.encodeSerializableValue(strategy, value)
+        }
     }
 }

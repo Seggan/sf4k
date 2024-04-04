@@ -51,13 +51,10 @@ class BlockStorageEncoder private constructor() : AbstractEncoder() {
     }
 
     companion object {
-
         fun <T> encode(strategy: SerializationStrategy<T>, value: T): String {
             val encoder = BlockStorageEncoder()
             encoder.encodeSerializableValue(strategy, value)
             return encoder.data.toString()
         }
-
-        inline fun <reified T> encode(value: T): String = encode(serializer(), value)
     }
 }

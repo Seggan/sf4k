@@ -12,7 +12,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 
 @OptIn(ExperimentalSerializationApi::class)
-class PersistentDataCompositeEncoder(
+internal class PersistentDataCompositeEncoder(
     private val plugin: Plugin,
     private val context: PersistentDataAdapterContext,
     private val parent: PersistentDataEncoder? = null
@@ -27,23 +27,23 @@ class PersistentDataCompositeEncoder(
     private fun SerialDescriptor.key(index: Int): NamespacedKey = this.getElementName(index).key()
 
     override fun encodeBooleanElement(descriptor: SerialDescriptor, index: Int, value: Boolean) {
-        data.set(descriptor.key(index), PersistentDataType.BOOLEAN, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeBoolean(value)
     }
 
     override fun encodeByteElement(descriptor: SerialDescriptor, index: Int, value: Byte) {
-        data.set(descriptor.key(index), PersistentDataType.BYTE, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeByte(value)
     }
 
     override fun encodeCharElement(descriptor: SerialDescriptor, index: Int, value: Char) {
-        data.set(descriptor.key(index), PersistentDataType.STRING, value.toString())
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeChar(value)
     }
 
     override fun encodeDoubleElement(descriptor: SerialDescriptor, index: Int, value: Double) {
-        data.set(descriptor.key(index), PersistentDataType.DOUBLE, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeDouble(value)
     }
 
     override fun encodeFloatElement(descriptor: SerialDescriptor, index: Int, value: Float) {
-        data.set(descriptor.key(index), PersistentDataType.FLOAT, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeFloat(value)
     }
 
     override fun encodeInlineElement(descriptor: SerialDescriptor, index: Int): Encoder {
@@ -51,11 +51,11 @@ class PersistentDataCompositeEncoder(
     }
 
     override fun encodeIntElement(descriptor: SerialDescriptor, index: Int, value: Int) {
-        data.set(descriptor.key(index), PersistentDataType.INTEGER, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeInt(value)
     }
 
     override fun encodeLongElement(descriptor: SerialDescriptor, index: Int, value: Long) {
-        data.set(descriptor.key(index), PersistentDataType.LONG, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeLong(value)
     }
 
     @ExperimentalSerializationApi
@@ -83,11 +83,11 @@ class PersistentDataCompositeEncoder(
     }
 
     override fun encodeShortElement(descriptor: SerialDescriptor, index: Int, value: Short) {
-        data.set(descriptor.key(index), PersistentDataType.SHORT, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeShort(value)
     }
 
     override fun encodeStringElement(descriptor: SerialDescriptor, index: Int, value: String) {
-        data.set(descriptor.key(index), PersistentDataType.STRING, value)
+        PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeString(value)
     }
 
     override fun endStructure(descriptor: SerialDescriptor) {

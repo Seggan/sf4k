@@ -2,6 +2,7 @@ package io.github.seggan.sf4k.serial
 
 import io.github.seggan.sf4k.serial.blockstorage.BlockStorageDecoder
 import io.github.seggan.sf4k.serial.blockstorage.BlockStorageEncoder
+import kotlinx.serialization.serializer
 import kotlin.test.Test
 
 class TestBSSerial {
@@ -16,8 +17,8 @@ class TestBSSerial {
 }
 
 private inline fun <reified T> T.invariantUnderSerializing() {
-    val encoded = BlockStorageEncoder.encode(this)
-    val decoded = BlockStorageDecoder.decode<T>(encoded)
+    val encoded = BlockStorageEncoder.encode(serializer(), this)
+    val decoded = BlockStorageDecoder.decode<T>(serializer(), encoded)
     println(encoded)
     assert(this == decoded)
 }
