@@ -6,6 +6,7 @@ import kotlinx.serialization.serializer
 import me.mrCookieSlime.Slimefun.api.BlockStorage
 import org.bukkit.Location
 import org.bukkit.block.Block
+import kotlin.math.abs
 
 inline fun <reified T> Location.getBlockStorage(
     key: String,
@@ -39,15 +40,23 @@ private const val BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP
 
 internal fun Long.toBase62(): String {
     val sb = StringBuilder()
-    var num = this
+    var num = abs(this)
     while (num > 0) {
         sb.append(BASE62[num.toInt() % 62])
         num /= 62
     }
+    if (this < 0) {
+        sb.append('-')
+    }
     return sb.reverse().toString()
 }
 
-internal fun CharSequence.fromBase62(): Long = fold(0) { acc, c -> acc * 62 + BASE62.indexOf(c) }
+internal fun CharSequence.fromBase62(): Long {
+    val negative = this[0] == '-'
+    val num = if (negative) substring(1) else this
+    val result = num.fold(0L) { acc, c -> acc * 62 + BASE62.indexOf(c) }
+    return if (negative) -result else result
+}
 
 internal fun StringBuilder.nom(): Char {
     val c = this[0]

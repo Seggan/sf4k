@@ -29,6 +29,12 @@ class PersistentDataEncoder internal constructor(
         return PersistentDataCompositeEncoder(plugin, context, this)
     }
 
+    override fun beginCollection(descriptor: SerialDescriptor, collectionSize: Int): CompositeEncoder {
+        val encoder = PersistentDataCompositeEncoder(plugin, context, this)
+        encoder.encodeSize(collectionSize)
+        return encoder
+    }
+
     override fun encodeBoolean(value: Boolean) {
         container.set(key, PersistentDataType.BOOLEAN, value)
     }
@@ -53,9 +59,7 @@ class PersistentDataEncoder internal constructor(
         container.set(key, PersistentDataType.FLOAT, value)
     }
 
-    override fun encodeInline(descriptor: SerialDescriptor): Encoder {
-        return this
-    }
+    override fun encodeInline(descriptor: SerialDescriptor): Encoder = this
 
     override fun encodeInt(value: Int) {
         container.set(key, PersistentDataType.INTEGER, value)
@@ -88,20 +92,13 @@ class PersistentDataEncoder internal constructor(
             value: T,
             container: PersistentDataContainer
         ) {
-            val encoder = PersistentDataEncoder(
-                pluginCache.getOrPut(key) {
-                    Bukkit.getPluginManager().plugins.find {
-                        it.name.equals(
-                            key.namespace,
-                            ignoreCase = true
-                        )
-                    } ?: throw SerializationException("No plugin found for namespace ${key.namespace}")
-                },
-                container.adapterContext,
-                key,
-                container
-            )
-            encoder.encodeSerializableValue(strategy, value)
+            val plugin = pluginCache.getOrPut(key) {
+                Bukkit.getPluginManager().plugins.find {
+                    it.name.equals(key.namespace, ignoreCase = true)
+                } ?: throw SerializationException("No plugin found for key $key")
+            }
+            PersistentDataEncoder(plugin, container.adapterContext, key, container)
+                .encodeSerializableValue(strategy, value)
         }
     }
 }

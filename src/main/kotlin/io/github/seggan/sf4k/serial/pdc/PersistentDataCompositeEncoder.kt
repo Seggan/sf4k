@@ -22,9 +22,12 @@ internal class PersistentDataCompositeEncoder(
 
     private val data = context.newPersistentDataContainer()
 
-    private fun String.key(): NamespacedKey = NamespacedKey(plugin, this)
+    private fun SerialDescriptor.key(index: Int): NamespacedKey =
+        NamespacedKey(plugin, this.getElementName(index))
 
-    private fun SerialDescriptor.key(index: Int): NamespacedKey = this.getElementName(index).key()
+    internal fun encodeSize(size: Int) {
+        data.set(NamespacedKey(plugin, "size"), PersistentDataType.INTEGER, size)
+    }
 
     override fun encodeBooleanElement(descriptor: SerialDescriptor, index: Int, value: Boolean) {
         PersistentDataEncoder(plugin, context, descriptor.key(index), data).encodeBoolean(value)
