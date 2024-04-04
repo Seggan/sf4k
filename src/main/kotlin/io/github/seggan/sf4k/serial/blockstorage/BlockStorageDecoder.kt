@@ -1,8 +1,5 @@
 package io.github.seggan.sf4k.serial.blockstorage
 
-import io.github.seggan.sf4k.serial.fromBase62
-import io.github.seggan.sf4k.serial.nom
-import io.github.seggan.sf4k.serial.nomWhile
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -10,7 +7,6 @@ import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.serializer
-import kotlin.text.StringBuilder
 
 @OptIn(ExperimentalSerializationApi::class)
 class BlockStorageDecoder private constructor(

@@ -1,6 +1,5 @@
 package io.github.seggan.sf4k.serial.blockstorage
 
-import io.github.seggan.sf4k.serial.toBase62
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor

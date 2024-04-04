@@ -24,6 +24,7 @@ dependencies {
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.14.0")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
     testImplementation(kotlin("test"))
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.9.0")
 }
 
 tasks.test {
