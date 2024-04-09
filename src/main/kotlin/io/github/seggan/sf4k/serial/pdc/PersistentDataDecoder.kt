@@ -15,6 +15,9 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 import java.util.WeakHashMap
 
+/**
+ * A [Decoder] implementation that reads from a [PersistentDataContainer].
+ */
 class PersistentDataDecoder internal constructor(
     private val plugin: Plugin,
     private val key: NamespacedKey,
@@ -61,19 +64,21 @@ class PersistentDataDecoder internal constructor(
 
     companion object {
 
-        private val keyCache = WeakHashMap<NamespacedKey, Plugin>()
-
+        /**
+         * Reads a value from a [PersistentDataContainer] using the given [DeserializationStrategy].
+         *
+         * @param strategy The strategy to use for deserialization
+         * @param key The key to read from
+         * @param container The container to read from
+         * @param T The type of the value
+         * @return The deserialized value
+         */
         fun <T> decode(
             strategy: DeserializationStrategy<T>,
             key: NamespacedKey,
             container: PersistentDataContainer
         ): T {
-            val plugin = keyCache.getOrPut(key) {
-                Bukkit.getPluginManager().plugins.find {
-                    it.name.equals(key.namespace, ignoreCase = true)
-                } ?: throw SerializationException("No plugin found for key $key")
-            }
-            return PersistentDataDecoder(plugin, key, container).decodeSerializableValue(strategy)
+            return PersistentDataDecoder(key.plugin, key, container).decodeSerializableValue(strategy)
         }
     }
 }

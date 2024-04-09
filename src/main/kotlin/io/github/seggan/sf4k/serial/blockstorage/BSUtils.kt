@@ -8,6 +8,15 @@ import org.bukkit.Location
 import org.bukkit.block.Block
 import kotlin.math.abs
 
+/**
+ * Gets a value from the [Location] with the given key.
+ *
+ * @receiver The [Location] to get the value from.
+ * @param key The key to get the value from.
+ * @param strategy The deserialization strategy to use. Defaults to [serializer].
+ * @param T The type of the value.
+ * @return The value, or null if it does not exist.
+ */
 inline fun <reified T> Location.getBlockStorage(
     key: String,
     strategy: DeserializationStrategy<T> = serializer()
@@ -16,11 +25,29 @@ inline fun <reified T> Location.getBlockStorage(
     return BlockStorageDecoder.decode(strategy, encoded)
 }
 
+/**
+ * Gets a value from the [Block] with the given key.
+ *
+ * @receiver The [Block] to get the value from.
+ * @param key The key to get the value from.
+ * @param strategy The deserialization strategy to use. Defaults to [serializer].
+ * @param T The type of the value.
+ * @return The value, or null if it does not exist.
+ */
 inline fun <reified T> Block.getBlockStorage(
     key: String,
     strategy: DeserializationStrategy<T> = serializer()
 ): T? = location.getBlockStorage(key, strategy)
 
+/**
+ * Sets a value in the [Location] with the given key.
+ *
+ * @receiver The [Location] to set the value in.
+ * @param key The key to set the value at.
+ * @param value The value to set.
+ * @param strategy The serialization strategy to use. Defaults to [serializer].
+ * @param T The type of the value.
+ */
 inline fun <reified T> Location.setBlockStorage(
     key: String,
     value: T,
@@ -30,6 +57,15 @@ inline fun <reified T> Location.setBlockStorage(
     BlockStorage.addBlockInfo(this, key, encoded)
 }
 
+/**
+ * Sets a value in the [Block] with the given key.
+ *
+ * @receiver The [Block] to set the value in.
+ * @param key The key to set the value at.
+ * @param value The value to set.
+ * @param strategy The serialization strategy to use. Defaults to [serializer].
+ * @param T The type of the value.
+ */
 inline fun <reified T> Block.setBlockStorage(
     key: String,
     value: T,

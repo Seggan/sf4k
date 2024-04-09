@@ -6,8 +6,6 @@ import io.github.seggan.sf4k.serial.pdc.get
 import io.github.seggan.sf4k.serial.pdc.set
 import io.github.seggan.sf4k.serial.serializers.LocationSerializer
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.serializer
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
@@ -45,7 +43,10 @@ class TestPDCSerial {
         TestObject("a", 1, null).invariantUnderSerialization()
         listOf(TestObject("a", 1, "c"), TestObject("a", 1, null)).invariantUnderSerialization()
         mapOf("a" to TestObject("a", 1, "c"), "b" to TestObject("a", 1, null)).invariantUnderSerialization()
+    }
 
+    @Test
+    fun testCustomSerializer() {
         val world = server.addSimpleWorld("world")
         Location(world, 0.0, 0.0, 0.0).invariantUnderSerialization(LocationSerializer)
     }

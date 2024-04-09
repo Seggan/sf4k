@@ -8,6 +8,5 @@ object UUIDSerializer : DelegatingSerializer<UUID, LongArray>(
     "java.util.UUID"
 ) {
     override fun toData(value: UUID): LongArray = longArrayOf(value.mostSignificantBits, value.leastSignificantBits)
-
     override fun fromData(value: LongArray): UUID = UUID(value[0], value[1])
 }

@@ -6,6 +6,14 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+/**
+ * A serializer that delegates serialization and deserialization to another serializer.
+ *
+ * @param T The type to serialize and deserialize.
+ * @param S The type to serialize and deserialize to.
+ * @param delegate The serializer to delegate to.
+ * @param descriptorName The name of the descriptor. Defaults to the simple name of the class.
+ */
 @OptIn(ExperimentalSerializationApi::class)
 abstract class DelegatingSerializer<T, S>(
     private val delegate: KSerializer<S>,
@@ -25,7 +33,21 @@ abstract class DelegatingSerializer<T, S>(
         return fromData(decoder.decodeSerializableValue(delegate))
     }
 
+    /**
+     * Converts a value of type [T] to a value of type [S].
+     * The [S] will then be serialized by the delegate serializer.
+     *
+     * @param value The value to convert.
+     * @return The converted value.
+     */
     abstract fun toData(value: T): S
 
+    /**
+     * Converts a value of type [S] to a value of type [T].
+     * The [S] will be deserialized by the delegate serializer.
+     *
+     * @param value The value to convert.
+     * @return The converted value.
+     */
     abstract fun fromData(value: S): T
 }

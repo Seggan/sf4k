@@ -7,6 +7,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.serializer
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.persistence.PersistentDataAdapterContext
@@ -15,6 +16,9 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 import java.util.WeakHashMap
 
+/**
+ * An [Encoder] that writes data to a [PersistentDataContainer].
+ */
 @OptIn(ExperimentalSerializationApi::class)
 class PersistentDataEncoder internal constructor(
     private val plugin: Plugin,
@@ -82,22 +86,51 @@ class PersistentDataEncoder internal constructor(
         container.set(key, PersistentDataType.STRING, value)
     }
 
+    private fun encodeByteArray(value: ByteArray) {
+        container.set(key, PersistentDataType.BYTE_ARRAY, value)
+    }
+
+    private val byteArrayDescriptor = serializer<ByteArray>().descriptor
+
+    private fun encodeIntArray(value: IntArray) {
+        container.set(key, PersistentDataType.INTEGER_ARRAY, value)
+    }
+
+    private val intArrayDescriptor = serializer<IntArray>().descriptor
+
+    private fun encodeLongArray(value: LongArray) {
+        container.set(key, PersistentDataType.LONG_ARRAY, value)
+    }
+
+    private val longArrayDescriptor = serializer<LongArray>().descriptor
+
+    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+        when (serializer.descriptor) {
+            byteArrayDescriptor -> encodeByteArray(value as ByteArray)
+            intArrayDescriptor -> encodeIntArray(value as IntArray)
+            longArrayDescriptor -> encodeLongArray(value as LongArray)
+            else -> super.encodeSerializableValue(serializer, value)
+        }
+    }
+
     companion object {
 
-        private val pluginCache = WeakHashMap<NamespacedKey, Plugin>()
-
+        /**
+         * Encodes a value to a [PersistentDataContainer] using the given [SerializationStrategy].
+         *
+         * @param strategy The strategy to use for encoding.
+         * @param key The key to store the value under.
+         * @param value The value to encode.
+         * @param container The container to write to.
+         * @param T The type of the value.
+         */
         fun <T> encode(
             strategy: SerializationStrategy<T>,
             key: NamespacedKey,
             value: T,
             container: PersistentDataContainer
         ) {
-            val plugin = pluginCache.getOrPut(key) {
-                Bukkit.getPluginManager().plugins.find {
-                    it.name.equals(key.namespace, ignoreCase = true)
-                } ?: throw SerializationException("No plugin found for key $key")
-            }
-            PersistentDataEncoder(plugin, container.adapterContext, key, container)
+            PersistentDataEncoder(key.plugin, container.adapterContext, key, container)
                 .encodeSerializableValue(strategy, value)
         }
     }

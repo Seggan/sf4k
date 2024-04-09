@@ -51,6 +51,15 @@ class BlockStorageEncoder private constructor() : AbstractEncoder() {
     }
 
     companion object {
+
+        /**
+         * Encodes a value using the [BlockStorageEncoder].
+         *
+         * @param strategy The serialization strategy to use.
+         * @param value The value to encode.
+         * @param T The type of the value.
+         * @return The encoded value.
+         */
         fun <T> encode(strategy: SerializationStrategy<T>, value: T): String {
             val encoder = BlockStorageEncoder()
             encoder.encodeSerializableValue(strategy, value)

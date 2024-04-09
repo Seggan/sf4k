@@ -52,6 +52,15 @@ class BlockStorageDecoder private constructor(
     override fun decodeString(): String = data.nom(decodeInt())
 
     companion object {
+
+        /**
+         * Decodes a value using the [BlockStorageDecoder].
+         *
+         * @param strategy The deserialization strategy to use.
+         * @param data The data to decode.
+         * @param T The type of the value.
+         * @return The decoded value.
+         */
         fun <T> decode(strategy: DeserializationStrategy<T>, data: String): T {
             val decoder = BlockStorageDecoder(StringBuilder(data), 0)
             return decoder.decodeSerializableValue(strategy)
