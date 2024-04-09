@@ -1,8 +1,8 @@
 name: Generate Docs
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
