@@ -41,6 +41,7 @@ class TestPDCSerial {
         mapOf(1 to 2, 3 to 4).invariantUnderSerialization()
         TestObject("a", 1, "c").invariantUnderSerialization()
         TestObject("a", 1, null).invariantUnderSerialization()
+        TestValue("a").invariantUnderSerialization()
         listOf(TestObject("a", 1, "c"), TestObject("a", 1, null)).invariantUnderSerialization()
         mapOf("a" to TestObject("a", 1, "c"), "b" to TestObject("a", 1, null)).invariantUnderSerialization()
     }

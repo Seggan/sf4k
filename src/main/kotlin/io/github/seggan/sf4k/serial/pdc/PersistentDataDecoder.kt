@@ -8,6 +8,7 @@ import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.serializer
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.persistence.PersistentDataContainer
@@ -31,7 +32,7 @@ class PersistentDataDecoder internal constructor(
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
-        return PersistentDataCompositeDecoder(plugin, container.get(key, PersistentDataType.TAG_CONTAINER)!!)
+        return PersistentDataCompositeDecoder(plugin, getOrThrow(PersistentDataType.TAG_CONTAINER))
     }
 
     override fun decodeBoolean(): Boolean = getOrThrow(PersistentDataType.BOOLEAN)
@@ -61,6 +62,34 @@ class PersistentDataDecoder internal constructor(
     override fun decodeShort(): Short = getOrThrow(PersistentDataType.SHORT)
 
     override fun decodeString(): String = getOrThrow(PersistentDataType.STRING)
+
+    private val byteArrayDescriptor = serializer<ByteArray>().descriptor
+
+    private fun decodeByteArray(): ByteArray {
+        return getOrThrow(PersistentDataType.BYTE_ARRAY)
+    }
+
+    private val intArrayDescriptor = serializer<IntArray>().descriptor
+
+    private fun decodeIntArray(): IntArray {
+        return getOrThrow(PersistentDataType.INTEGER_ARRAY)
+    }
+
+    private val longArrayDescriptor = serializer<LongArray>().descriptor
+
+    private fun decodeLongArray(): LongArray {
+        return getOrThrow(PersistentDataType.LONG_ARRAY)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return when (deserializer.descriptor) {
+            byteArrayDescriptor -> decodeByteArray() as T
+            intArrayDescriptor -> decodeIntArray() as T
+            longArrayDescriptor -> decodeLongArray() as T
+            else -> super.decodeSerializableValue(deserializer)
+        }
+    }
 
     companion object {
 
