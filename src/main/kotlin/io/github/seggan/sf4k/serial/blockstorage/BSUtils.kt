@@ -21,7 +21,7 @@ inline fun <reified T> Location.getBlockStorage(
     key: String,
     strategy: DeserializationStrategy<T> = serializer()
 ): T? {
-    val encoded = BlockStorage.getLocationInfo(this, key)
+    val encoded = BlockStorage.getLocationInfo(this, key) ?: return null
     return BlockStorageDecoder.decode(strategy, encoded)
 }
 
