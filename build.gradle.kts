@@ -1,14 +1,14 @@
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.0.0"
+    kotlin("plugin.serialization") version "2.0.0"
     id("org.jetbrains.dokka") version "1.9.0"
-    kotlin("plugin.serialization") version "1.9.22"
     `java-library`
     signing
     id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
 }
 
 group = "io.github.seggan"
-version = "0.3.2"
+version = "0.4.0"
 description = "A simple library for creating Slimefun addons in Kotlin."
 
 repositories {

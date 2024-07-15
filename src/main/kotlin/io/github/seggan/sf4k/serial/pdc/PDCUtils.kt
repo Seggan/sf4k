@@ -1,5 +1,6 @@
 package io.github.seggan.sf4k.serial.pdc
 
+import io.github.seggan.sf4k.serial.serializers.defaultSerializerOrRegistered
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
@@ -21,7 +22,7 @@ import java.util.*
 inline fun <reified T> PersistentDataContainer.set(
     key: NamespacedKey,
     value: T,
-    strategy: SerializationStrategy<T> = serializer()
+    strategy: SerializationStrategy<T> = defaultSerializerOrRegistered()
 ) {
     PersistentDataEncoder.encode(strategy, key, value, this)
 }
@@ -37,7 +38,7 @@ inline fun <reified T> PersistentDataContainer.set(
  */
 inline fun <reified T> PersistentDataContainer.get(
     key: NamespacedKey,
-    strategy: DeserializationStrategy<T> = serializer()
+    strategy: DeserializationStrategy<T> = defaultSerializerOrRegistered()
 ): T? {
     return PersistentDataDecoder.decode(strategy, key, this)
 }
