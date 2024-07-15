@@ -79,7 +79,7 @@ internal fun Long.toBase62(): String {
     val sb = StringBuilder()
     var num = abs(this)
     while (num > 0) {
-        sb.append(BASE62[num.toInt() % 62])
+        sb.append(BASE62[(num % 62).toInt()])
         num /= 62
     }
     if (this < 0) {
