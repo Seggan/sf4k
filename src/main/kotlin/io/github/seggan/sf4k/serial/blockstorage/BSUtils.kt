@@ -89,6 +89,7 @@ internal fun Long.toBase62(): String {
 }
 
 internal fun CharSequence.fromBase62(): Long {
+    if (isEmpty()) return 0
     val negative = this[0] == '-'
     val num = if (negative) substring(1) else this
     val result = num.fold(0L) { acc, c -> acc * 62 + BASE62.indexOf(c) }
