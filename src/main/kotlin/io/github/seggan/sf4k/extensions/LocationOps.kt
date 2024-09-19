@@ -1,8 +1,9 @@
-package io.github.seggan.sf4k.location
+package io.github.seggan.sf4k.extensions
 
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
 import org.bukkit.Location
 import org.bukkit.block.Block
+import org.bukkit.util.Vector
 
 operator fun Location.component1(): Double = x
 operator fun Location.component2(): Double = y
@@ -19,6 +20,13 @@ operator fun Location.timesAssign(factor: Double) { this.multiply(factor) }
 
 operator fun Location.div(factor: Double): Location = this.clone().multiply(1 / factor)
 operator fun Location.divAssign(factor: Double) { this.multiply(1 / factor) }
+
+// Vector ops
+operator fun Location.plus(other: Vector) = clone().add(other)
+operator fun Location.plusAssign(other: Vector) { add(other) }
+
+operator fun Location.minus(other: Vector) = clone().subtract(other)
+operator fun Location.minusAssign(other: Vector) { subtract(other) }
 
 val Location.position: BlockPosition
     get() = BlockPosition(this)
