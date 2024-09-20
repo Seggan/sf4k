@@ -1,6 +1,6 @@
 package io.github.seggan.sf4k.serial.pdc
 
-import io.github.seggan.sf4k.serial.serializers.defaultSerializerOrRegistered
+import io.github.seggan.sf4k.serial.serializers.BukkitSerializerRegistry
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
@@ -19,10 +19,10 @@ import java.util.*
  * @param strategy The serialization strategy to use. Defaults to [serializer].
  * @param T The type of the value.
  */
-inline fun <reified T> PersistentDataContainer.set(
+inline fun <reified T> PersistentDataContainer.setData(
     key: NamespacedKey,
     value: T,
-    strategy: SerializationStrategy<T> = defaultSerializerOrRegistered()
+    strategy: SerializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
 ) {
     PersistentDataEncoder.encode(strategy, key, value, this)
 }
@@ -36,9 +36,9 @@ inline fun <reified T> PersistentDataContainer.set(
  * @param T The type of the value.
  * @return The value, or null if it does not exist.
  */
-inline fun <reified T> PersistentDataContainer.get(
+inline fun <reified T> PersistentDataContainer.getData(
     key: NamespacedKey,
-    strategy: DeserializationStrategy<T> = defaultSerializerOrRegistered()
+    strategy: DeserializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
 ): T? {
     return PersistentDataDecoder.decode(strategy, key, this)
 }

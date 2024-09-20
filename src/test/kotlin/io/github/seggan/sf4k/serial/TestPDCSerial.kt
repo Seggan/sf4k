@@ -2,16 +2,14 @@ package io.github.seggan.sf4k.serial
 
 import be.seeseemelk.mockbukkit.MockBukkit
 import be.seeseemelk.mockbukkit.ServerMock
-import io.github.seggan.sf4k.serial.pdc.get
-import io.github.seggan.sf4k.serial.pdc.set
+import io.github.seggan.sf4k.serial.pdc.getData
+import io.github.seggan.sf4k.serial.pdc.setData
+import io.github.seggan.sf4k.serial.serializers.BukkitSerializerRegistry
 import io.github.seggan.sf4k.serial.serializers.LocationSerializer
-import io.github.seggan.sf4k.serial.serializers.defaultSerializerOrRegistered
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.serializer
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -55,13 +53,13 @@ class TestPDCSerial {
         Location(world, 0.0, 0.0, 0.0).invariantUnderSerialization(LocationSerializer)
     }
 
-    private inline fun <reified T> T.invariantUnderSerialization(serializer: KSerializer<T> = defaultSerializerOrRegistered()) {
+    private inline fun <reified T> T.invariantUnderSerialization(serializer: KSerializer<T> = BukkitSerializerRegistry.serializer<T>()) {
         val player = server.addPlayer()
         val testPlugin = MockBukkit.createMockPlugin()
         val key = NamespacedKey(testPlugin, "test")
         val pdc = player.persistentDataContainer
-        pdc.set(key, this, serializer)
-        val decoded: T = pdc.get(key, serializer)!!
+        pdc.setData(key, this, serializer)
+        val decoded: T = pdc.getData(key, serializer)!!
         expectThat(this).isEqualTo(decoded)
         server.pluginManager.disablePlugin(testPlugin)
         server.setPlayers(0)

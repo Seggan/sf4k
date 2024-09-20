@@ -1,6 +1,6 @@
 package io.github.seggan.sf4k.serial.blockstorage
 
-import io.github.seggan.sf4k.serial.serializers.defaultSerializerOrRegistered
+import io.github.seggan.sf4k.serial.serializers.BukkitSerializerRegistry
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.serializer
@@ -20,7 +20,7 @@ import kotlin.math.abs
  */
 inline fun <reified T> Location.getBlockStorage(
     key: String,
-    strategy: DeserializationStrategy<T> = defaultSerializerOrRegistered()
+    strategy: DeserializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
 ): T? {
     val encoded = BlockStorage.getLocationInfo(this, key) ?: return null
     return BlockStorageDecoder.decode(strategy, encoded)
@@ -37,7 +37,7 @@ inline fun <reified T> Location.getBlockStorage(
  */
 inline fun <reified T> Block.getBlockStorage(
     key: String,
-    strategy: DeserializationStrategy<T> = defaultSerializerOrRegistered()
+    strategy: DeserializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
 ): T? = location.getBlockStorage(key, strategy)
 
 /**
@@ -52,7 +52,7 @@ inline fun <reified T> Block.getBlockStorage(
 inline fun <reified T> Location.setBlockStorage(
     key: String,
     value: T,
-    strategy: SerializationStrategy<T> = defaultSerializerOrRegistered()
+    strategy: SerializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
 ) {
     val encoded = BlockStorageEncoder.encode(strategy, value)
     BlockStorage.addBlockInfo(this, key, encoded)
@@ -70,7 +70,7 @@ inline fun <reified T> Location.setBlockStorage(
 inline fun <reified T> Block.setBlockStorage(
     key: String,
     value: T,
-    strategy: SerializationStrategy<T> = defaultSerializerOrRegistered()
+    strategy: SerializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
 ) = location.setBlockStorage(key, value, strategy)
 
 private const val BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
