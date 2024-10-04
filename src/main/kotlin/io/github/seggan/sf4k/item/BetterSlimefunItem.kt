@@ -28,6 +28,9 @@ import io.github.thebusybiscuit.slimefun4.api.items.ItemHandler as SfItemHandler
 /**
  * A "better" version of [SlimefunItem] that allows the use of [ItemHandler] and [Ticker] annotations.
  * Also comes with miscellaneous stuff.
+ *
+ * @see ItemHandler
+ * @see Ticker
  */
 open class BetterSlimefunItem : SlimefunItem {
 
