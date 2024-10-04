@@ -14,7 +14,7 @@ fun ItemStack.isSlimefun() : Boolean = SlimefunItem.getByItem(this) != null
  * Returns the associated [SlimefunItem] to an item stack, cast to the specified subclass.
  * In case none is found, the return value will be null.
  */
-inline fun <reified T : SlimefunItem> ItemStack.getSlimefun(): T? {
+inline fun <reified T : SlimefunItem> ItemStack?.getSlimefun(): T? {
     return SlimefunItem.getByItem(this) as? T
 }
 
