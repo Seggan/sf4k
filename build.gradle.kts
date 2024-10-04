@@ -19,14 +19,15 @@ repositories {
 
 dependencies {
     compileOnlyApi("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnlyApi("com.github.Slimefun:Slimefun4:RC-37")
+    compileOnlyApi("com.github.Slimefun:Slimefun4:e02a0f61d1")
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.19.0")
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.19.0")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
+    implementation(kotlin("reflect"))
     testImplementation(kotlin("test"))
     testImplementation("io.strikt:strikt-core:0.34.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.80.0")
-    testImplementation("com.github.Slimefun:Slimefun4:RC-37")
+    testImplementation("com.github.Slimefun:Slimefun4:e02a0f61d1")
 }
 
 tasks.test {
