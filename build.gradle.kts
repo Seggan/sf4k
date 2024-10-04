@@ -4,11 +4,11 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.0"
     `java-library`
     signing
-    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.3"
+    id("net.thebugmc.gradle.sonatype-central-portal-publisher") version "1.2.4"
 }
 
 group = "io.github.seggan"
-version = "0.6.0"
+version = "0.7.0"
 description = "A simple library for creating Slimefun addons in Kotlin."
 
 repositories {
@@ -23,7 +23,7 @@ dependencies {
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.19.0")
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.19.0")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
-    implementation(kotlin("reflect"))
+    api(kotlin("reflect"))
     testImplementation(kotlin("test"))
     testImplementation("io.strikt:strikt-core:0.34.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.80.0")

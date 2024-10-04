@@ -6,22 +6,16 @@ import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KProperty
 
 /**
- * Checks if the item stack has slimefun data.
+ * Checks if the [ItemStack] has Slimefun data.
  */
 fun ItemStack.isSlimefun() : Boolean = SlimefunItem.getByItem(this) != null
 
 /**
- * Returns the associated SlimefunItem to an item stack,
- * in case none is found, the return value will be null.
+ * Returns the associated [SlimefunItem] to an item stack, cast to the specified subclass.
+ * In case none is found, the return value will be null.
  */
-fun ItemStack.getSlimefun() : SlimefunItem? = SlimefunItem.getByItem(this)
-
-/**
- * Behaves the same way as the extension function [ItemStack.getSlimefun],
- * only difference is that it casts the result to a subclass of the specified [SlimefunItem].
- */
-inline fun <reified T : SlimefunItem> ItemStack.getSlimefun(): T {
-    return this.getSlimefun() as T
+inline fun <reified T : SlimefunItem> ItemStack.getSlimefun(): T? {
+    return SlimefunItem.getByItem(this) as? T
 }
 
 /**
