@@ -1,6 +1,8 @@
 package io.github.seggan.sf4k.item.builder
 
 import io.github.seggan.sf4k.extensions.defaultLegacyColor
+import io.github.seggan.sf4k.extensions.findConstructor
+import io.github.seggan.sf4k.extensions.findConstructorFromArgs
 import io.github.seggan.sf4k.extensions.miniMessageToLegacy
 import io.github.seggan.sf4k.util.RequiredProperty
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
@@ -9,8 +11,13 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.ItemStack
+import kotlin.properties.PropertyDelegateProvider
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.isSupertypeOf
+import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.full.valueParameters
 
 /**
  * The main DSL class for constructing a [SlimefunItem]
@@ -68,8 +75,10 @@ class ItemBuilder(private val registry: ItemRegistry) {
             name.miniMessageToLegacy().defaultLegacyColor('f'),
             *lore.map { it.defaultLegacyColor('7') }.toTypedArray()
         )
-        val constructor = clazz.primaryConstructor ?: error("Primary constructor not found for $clazz")
-        constructor.call(category, sfi, recipeType, recipe, *otherArgs).register(registry.addon)
+        val args = arrayOf(category, sfi, recipeType, recipe, *otherArgs)
+        val constructor = clazz.findConstructorFromArgs(*args)
+            ?: error("No constructor found for ${clazz.simpleName} with arguments: ${args.joinToString()}")
+        constructor.call(*args).register(registry.addon)
         return sfi
     }
 }
@@ -113,17 +122,23 @@ inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItem(
 }
 
 /**
- * Builds a default [SlimefunItem] in the same way as [buildSlimefunItem].
+ * Acts similar to [buildSlimefunItem], but automatically sets the item's ID to the
+ * property name in uppercase.
+ * As such, it can only be used as a property delegate.
  *
+ * @param otherArgs any arguments to be passed to the item's constructor
  * @param builder the block to build with
  *
  * @return the constructed [SlimefunItemStack], with the corresponding [SlimefunItem]
  *  already registered
- *
- * @see buildSlimefunItem
  */
-inline fun ItemRegistry.buildSlimefunItem(
-    builder: ItemBuilder.() -> Unit
-): SlimefunItemStack {
-    return ItemBuilder(this).apply(builder).build(SlimefunItem::class)
+inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItemDefaultId(
+    vararg otherArgs: Any?,
+    crossinline builder: ItemBuilder.() -> Unit
+) = PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SlimefunItemStack>> { _, property ->
+    val item = buildSlimefunItem<I>(*otherArgs) {
+        id = property.name.uppercase()
+        builder()
+    }
+    ReadOnlyProperty { _, _ -> item }
 }

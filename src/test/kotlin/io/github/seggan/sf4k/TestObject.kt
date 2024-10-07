@@ -1,4 +1,4 @@
-package io.github.seggan.sf4k.serial
+package io.github.seggan.sf4k
 
 import kotlinx.serialization.Serializable
 
