@@ -1,4 +1,4 @@
-package io.github.seggan.sf4k.extensions
+package io.github.seggan.sf4k.util
 
 import kotlin.jvm.internal.Reflection
 import kotlin.reflect.*

@@ -1,18 +1,15 @@
 package io.github.seggan.sf4k.item.builder
 
 import io.github.seggan.sf4k.TestObject
-import io.github.seggan.sf4k.extensions.findConstructor
-import io.github.seggan.sf4k.extensions.findConstructorFromArgs
+import io.github.seggan.sf4k.util.findConstructor
+import io.github.seggan.sf4k.util.findConstructorFromArgs
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import org.bukkit.inventory.ItemStack
-import strikt.api.expectCatching
 import strikt.api.expectThat
-import strikt.assertions.isFailure
 import strikt.assertions.isNotNull
-import strikt.assertions.isSuccess
 import kotlin.test.Test
 
 class ReflectionTest {

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.seggan"
-version = "0.7.2"
+version = "0.7.3"
 description = "A simple library for creating Slimefun addons in Kotlin."
 
 repositories {

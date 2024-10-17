@@ -1,8 +1,7 @@
 package io.github.seggan.sf4k.item.builder
 
 import io.github.seggan.sf4k.extensions.defaultLegacyColor
-import io.github.seggan.sf4k.extensions.findConstructor
-import io.github.seggan.sf4k.extensions.findConstructorFromArgs
+import io.github.seggan.sf4k.util.findConstructorFromArgs
 import io.github.seggan.sf4k.extensions.miniMessageToLegacy
 import io.github.seggan.sf4k.util.RequiredProperty
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
@@ -11,13 +10,12 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.ItemStack
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.full.isSupertypeOf
-import kotlin.reflect.full.starProjectedType
-import kotlin.reflect.full.valueParameters
 
 /**
  * The main DSL class for constructing a [SlimefunItem]
@@ -114,10 +112,14 @@ class ItemBuilder(private val registry: ItemRegistry) {
  * @return the constructed [SlimefunItemStack], with the corresponding [SlimefunItem]
  *  already registered
  */
+@OptIn(ExperimentalContracts::class)
 inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItem(
     vararg otherArgs: Any?,
     builder: ItemBuilder.() -> Unit
 ): SlimefunItemStack {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+    }
     return ItemBuilder(this).apply(builder).build(I::class, *otherArgs)
 }
 
@@ -132,13 +134,19 @@ inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItem(
  * @return the constructed [SlimefunItemStack], with the corresponding [SlimefunItem]
  *  already registered
  */
+@OptIn(ExperimentalContracts::class)
 inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItemDefaultId(
     vararg otherArgs: Any?,
     crossinline builder: ItemBuilder.() -> Unit
-) = PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SlimefunItemStack>> { _, property ->
-    val item = buildSlimefunItem<I>(*otherArgs) {
-        id = property.name.uppercase()
-        builder()
+): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SlimefunItemStack>> {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
-    ReadOnlyProperty { _, _ -> item }
+    return PropertyDelegateProvider { _, property ->
+        val item = buildSlimefunItem<I>(*otherArgs) {
+            id = property.name.uppercase()
+            builder()
+        }
+        ReadOnlyProperty { _, _ -> item }
+    }
 }

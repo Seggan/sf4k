@@ -3,6 +3,9 @@ package io.github.seggan.sf4k.item.builder
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Builds a 3x3 recipe
@@ -61,6 +64,10 @@ class RecipeBuilder {
  * }
  * ```
  */
+@OptIn(ExperimentalContracts::class)
 inline fun buildRecipe(init: RecipeBuilder.() -> Unit): Array<out ItemStack?> {
+    contract {
+        callsInPlace(init, InvocationKind.EXACTLY_ONCE)
+    }
     return RecipeBuilder().apply(init).build()
 }
