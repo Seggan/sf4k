@@ -6,6 +6,7 @@ import io.github.seggan.sf4k.TestObject
 import io.github.seggan.sf4k.TestValue
 import io.github.seggan.sf4k.serial.blockstorage.BlockStorageDecoder
 import io.github.seggan.sf4k.serial.blockstorage.BlockStorageEncoder
+import io.github.seggan.sf4k.serial.blockstorage.BlockStorageSettings
 import io.github.seggan.sf4k.serial.serializers.BukkitSerializerRegistry
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition
@@ -58,8 +59,8 @@ class BsSerialTest {
 }
 
 private inline fun <reified T> T.invariantUnderSerialization() {
-    val encoded = BlockStorageEncoder.encode(BukkitSerializerRegistry.serializer<T>(), this)
-    val decoded = BlockStorageDecoder.decode(BukkitSerializerRegistry.serializer<T>(), encoded)
+    val encoded = BlockStorageEncoder.encode(BukkitSerializerRegistry.serializer<T>(), this, BlockStorageSettings())
+    val decoded = BlockStorageDecoder.decode(BukkitSerializerRegistry.serializer<T>(), encoded, BlockStorageSettings())
     println(encoded)
     expectThat(decoded).isEqualTo(this)
 }

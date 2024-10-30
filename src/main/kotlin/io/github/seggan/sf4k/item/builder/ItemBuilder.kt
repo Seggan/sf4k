@@ -14,7 +14,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.properties.PropertyDelegateProvider
-import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 
 /**
@@ -66,7 +65,7 @@ class ItemBuilder(private val registry: ItemRegistry) {
         lore += this.miniMessageToLegacy()
     }
 
-    fun build(clazz: KClass<out SlimefunItem>, vararg otherArgs: Any?): SlimefunItemStack {
+    fun <T : SlimefunItem> build(clazz: KClass<T>, vararg otherArgs: Any?): Pair<SlimefunItemStack, T> {
         val sfi = SlimefunItemStack(
             id,
             material.convert(),
@@ -76,16 +75,18 @@ class ItemBuilder(private val registry: ItemRegistry) {
         val args = arrayOf(category, sfi, recipeType, recipe, *otherArgs)
         val constructor = clazz.findConstructorFromArgs(*args)
             ?: error("No constructor found for ${clazz.simpleName} with arguments: ${args.joinToString()}")
-        constructor.call(*args).register(registry.addon)
-        return sfi
+        val item = constructor.call(*args)
+        item.register(registry.addon)
+        return sfi to item
     }
 }
 
 /**
- * Builds a [SlimefunItem] of the specified type. The item **must** have a primary
- * constructor `(ItemGroup, SlimefunItemStack, RecipeType, Array<out ItemStack>, ...)`.
+ * Builds a [SlimefunItem] of the specified type.
+ * The item **must** have a constructor `(ItemGroup, SlimefunItemStack, RecipeType, Array<out ItemStack>, ...)`.
  * Any extra arguments given to this function will be passed to the end of the item's
  * constructor.
+ * The return value is intended to be used as a property delegate.
  *
  * Example:
  * ```kotlin
@@ -94,10 +95,10 @@ class ItemBuilder(private val registry: ItemRegistry) {
  *
  * // --- snip ---
  *
- * buildSlimefunItem<MyItem>(1) { // 1 will be passed to the `something` parameter
+ * val MY_ITEM by buildSlimefunItem<MyItem>(1) { // 1 will be passed to the `something` parameter
  *  category = ItemGroup.SOMETHING
  *  name = "<gray>The default item name is white, but you can change it with MiniMessage"
- *  id = "BAR"
+ *  id = "BAR" // Defaults to the property name, but you can override it
  *  recipe = RecipeType.NULL
  *  recipe = arrayOf(...)
  *
@@ -109,44 +110,15 @@ class ItemBuilder(private val registry: ItemRegistry) {
  * @param otherArgs any arguments to be passed to the item's constructor
  * @param builder the block to build with
  *
- * @return the constructed [SlimefunItemStack], with the corresponding [SlimefunItem]
- *  already registered
+ * @return an [ItemProvider] for the built item
  */
-@OptIn(ExperimentalContracts::class)
 inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItem(
     vararg otherArgs: Any?,
-    builder: ItemBuilder.() -> Unit
-): SlimefunItemStack {
-    contract {
-        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-    }
-    return ItemBuilder(this).apply(builder).build(I::class, *otherArgs)
-}
-
-/**
- * Acts similar to [buildSlimefunItem], but automatically sets the item's ID to the
- * property name in uppercase.
- * As such, it can only be used as a property delegate.
- *
- * @param otherArgs any arguments to be passed to the item's constructor
- * @param builder the block to build with
- *
- * @return the constructed [SlimefunItemStack], with the corresponding [SlimefunItem]
- *  already registered
- */
-@OptIn(ExperimentalContracts::class)
-inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItemDefaultId(
-    vararg otherArgs: Any?,
     crossinline builder: ItemBuilder.() -> Unit
-): PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SlimefunItemStack>> {
-    contract {
-        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-    }
-    return PropertyDelegateProvider { _, property ->
-        val item = buildSlimefunItem<I>(*otherArgs) {
-            id = property.name.uppercase()
-            builder()
-        }
-        ReadOnlyProperty { _, _ -> item }
-    }
+) = PropertyDelegateProvider<Any?, ItemProvider<I>> { _, property ->
+    val itemBuilder = ItemBuilder(this)
+    itemBuilder.id = property.name.uppercase()
+    itemBuilder.apply(builder)
+    val item = itemBuilder.build(I::class, *otherArgs)
+    ItemProvider(item.first, item.second)
 }
