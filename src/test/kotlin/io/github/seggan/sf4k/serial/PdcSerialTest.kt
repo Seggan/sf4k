@@ -48,6 +48,7 @@ class PdcSerialTest {
         TestValue("a").invariantUnderSerialization()
         listOf(TestObject("a", 1, "c"), TestObject("a", 1, null)).invariantUnderSerialization()
         mapOf("a" to TestObject("a", 1, "c"), "b" to TestObject("a", 1, null)).invariantUnderSerialization()
+        NamespacedKey("test", "test").invariantUnderSerialization()
     }
 
     @Test

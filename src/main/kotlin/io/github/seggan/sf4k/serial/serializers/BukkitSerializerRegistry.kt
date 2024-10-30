@@ -23,6 +23,10 @@ object BukkitSerializerRegistry {
             contextual(PlayerSerializer)
             contextual(OfflinePlayerSerializer)
             contextual(UUIDSerializer)
+            contextual(NamespacedKeySerializer)
+            contextual(VectorSerializer)
+            contextual(BlockVectorSerializer)
+            contextual(ItemStackSerializer)
         }
     }
 

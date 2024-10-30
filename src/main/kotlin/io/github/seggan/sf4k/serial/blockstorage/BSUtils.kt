@@ -15,15 +15,17 @@ import kotlin.math.abs
  * @receiver The [Location] to get the value from.
  * @param key The key to get the value from.
  * @param strategy The deserialization strategy to use. Defaults to [serializer].
+ * @param settings The settings to use when deserializing the value.
  * @param T The type of the value.
  * @return The value, or null if it does not exist.
  */
 inline fun <reified T> Location.getBlockStorage(
     key: String,
-    strategy: DeserializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
+    strategy: DeserializationStrategy<T> = BukkitSerializerRegistry.serializer<T>(),
+    settings: BlockStorageSettings = BlockStorageSettings()
 ): T? {
     val encoded = BlockStorage.getLocationInfo(this, key) ?: return null
-    return BlockStorageDecoder.decode(strategy, encoded)
+    return BlockStorageDecoder.decode(strategy, encoded, settings)
 }
 
 /**
@@ -32,13 +34,15 @@ inline fun <reified T> Location.getBlockStorage(
  * @receiver The [Block] to get the value from.
  * @param key The key to get the value from.
  * @param strategy The deserialization strategy to use. Defaults to [serializer].
+ * @param settings The settings to use when deserializing the value.
  * @param T The type of the value.
  * @return The value, or null if it does not exist.
  */
 inline fun <reified T> Block.getBlockStorage(
     key: String,
-    strategy: DeserializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
-): T? = location.getBlockStorage(key, strategy)
+    strategy: DeserializationStrategy<T> = BukkitSerializerRegistry.serializer<T>(),
+    settings: BlockStorageSettings = BlockStorageSettings()
+): T? = location.getBlockStorage(key, strategy, settings)
 
 /**
  * Sets a value in the [Location] with the given key.
@@ -47,14 +51,16 @@ inline fun <reified T> Block.getBlockStorage(
  * @param key The key to set the value at.
  * @param value The value to set.
  * @param strategy The serialization strategy to use. Defaults to [serializer].
+ * @param settings The settings to use when serializing the value.
  * @param T The type of the value.
  */
 inline fun <reified T> Location.setBlockStorage(
     key: String,
     value: T,
-    strategy: SerializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
+    strategy: SerializationStrategy<T> = BukkitSerializerRegistry.serializer<T>(),
+    settings: BlockStorageSettings = BlockStorageSettings()
 ) {
-    val encoded = BlockStorageEncoder.encode(strategy, value)
+    val encoded = BlockStorageEncoder.encode(strategy, value, settings)
     BlockStorage.addBlockInfo(this, key, encoded)
 }
 
@@ -65,13 +71,15 @@ inline fun <reified T> Location.setBlockStorage(
  * @param key The key to set the value at.
  * @param value The value to set.
  * @param strategy The serialization strategy to use. Defaults to [serializer].
+ * @param settings The settings to use when serializing the value.
  * @param T The type of the value.
  */
 inline fun <reified T> Block.setBlockStorage(
     key: String,
     value: T,
-    strategy: SerializationStrategy<T> = BukkitSerializerRegistry.serializer<T>()
-) = location.setBlockStorage(key, value, strategy)
+    strategy: SerializationStrategy<T> = BukkitSerializerRegistry.serializer<T>(),
+    settings: BlockStorageSettings = BlockStorageSettings()
+) = location.setBlockStorage(key, value, strategy, settings)
 
 private const val BASE62 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 

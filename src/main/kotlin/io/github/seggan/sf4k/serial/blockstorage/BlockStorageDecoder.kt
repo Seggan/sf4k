@@ -7,11 +7,14 @@ import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.serializer
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalSerializationApi::class)
 class BlockStorageDecoder private constructor(
     private val data: StringBuilder,
     private var elementsCount: Int,
+    private val settings: BlockStorageSettings
 ) : AbstractDecoder() {
 
     override val serializersModule = EmptySerializersModule()
@@ -22,7 +25,7 @@ class BlockStorageDecoder private constructor(
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder =
-        BlockStorageDecoder(data, descriptor.elementsCount)
+        BlockStorageDecoder(data, descriptor.elementsCount, settings)
 
     @ExperimentalSerializationApi
     override fun decodeSequentially(): Boolean = true
@@ -51,6 +54,23 @@ class BlockStorageDecoder private constructor(
 
     override fun decodeString(): String = data.nom(decodeInt())
 
+    private val byteArrayDescriptor = serializer<ByteArray>().descriptor
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun decodeByteArray(): ByteArray {
+        val base64 = data.nomWhile { it != ' ' }
+        return Base64.decode(base64)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return if (settings.encodeByteArrayAsBase64 && deserializer.descriptor == byteArrayDescriptor) {
+            decodeByteArray() as T
+        } else {
+            super.decodeSerializableValue(deserializer)
+        }
+    }
+
     companion object {
 
         /**
@@ -58,11 +78,12 @@ class BlockStorageDecoder private constructor(
          *
          * @param strategy The deserialization strategy to use.
          * @param data The data to decode.
+         * @param settings The settings to use when deserializing the value.
          * @param T The type of the value.
          * @return The decoded value.
          */
-        fun <T> decode(strategy: DeserializationStrategy<T>, data: String): T {
-            val decoder = BlockStorageDecoder(StringBuilder(data), 0)
+        fun <T> decode(strategy: DeserializationStrategy<T>, data: String, settings: BlockStorageSettings): T {
+            val decoder = BlockStorageDecoder(StringBuilder(data), 0, settings)
             return decoder.decodeSerializableValue(strategy)
         }
     }

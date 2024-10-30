@@ -2,6 +2,8 @@ package io.github.seggan.sf4k.serial.serializers
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -20,10 +22,17 @@ abstract class DelegatingSerializer<T, S>(
     descriptorName: String? = null
 ) : KSerializer<T> {
 
-    final override val descriptor = SerialDescriptor(
-        descriptorName ?: javaClass.simpleName,
-        delegate.descriptor
-    )
+    final override val descriptor: SerialDescriptor
+
+    init {
+        val kind = delegate.descriptor.kind
+        val name = descriptorName ?: javaClass.simpleName
+        descriptor = if (kind is PrimitiveKind) {
+            PrimitiveSerialDescriptor(name, kind)
+        } else {
+            SerialDescriptor(name, delegate.descriptor)
+        }
+    }
 
     final override fun serialize(encoder: Encoder, value: T) {
         encoder.encodeSerializableValue(delegate, toData(value))

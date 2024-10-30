@@ -7,9 +7,11 @@ import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.serializer
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalSerializationApi::class)
-class BlockStorageEncoder private constructor() : AbstractEncoder() {
+class BlockStorageEncoder private constructor(private val settings: BlockStorageSettings) : AbstractEncoder() {
 
     override val serializersModule = EmptySerializersModule()
 
@@ -50,6 +52,22 @@ class BlockStorageEncoder private constructor() : AbstractEncoder() {
         return this
     }
 
+    private val byteArrayDescriptor = serializer<ByteArray>().descriptor
+
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun encodeByteArray(byteArray: ByteArray) {
+        val base64 = Base64.encode(byteArray)
+        data.append(base64).append(' ')
+    }
+
+    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+        if (settings.encodeByteArrayAsBase64 && serializer.descriptor == byteArrayDescriptor) {
+            encodeByteArray(value as ByteArray)
+        } else {
+            super.encodeSerializableValue(serializer, value)
+        }
+    }
+
     companion object {
 
         /**
@@ -58,10 +76,11 @@ class BlockStorageEncoder private constructor() : AbstractEncoder() {
          * @param strategy The serialization strategy to use.
          * @param value The value to encode.
          * @param T The type of the value.
+         * @param settings The settings to use for encoding.
          * @return The encoded value.
          */
-        fun <T> encode(strategy: SerializationStrategy<T>, value: T): String {
-            val encoder = BlockStorageEncoder()
+        fun <T> encode(strategy: SerializationStrategy<T>, value: T, settings: BlockStorageSettings): String {
+            val encoder = BlockStorageEncoder(settings)
             encoder.encodeSerializableValue(strategy, value)
             return encoder.data.toString()
         }
