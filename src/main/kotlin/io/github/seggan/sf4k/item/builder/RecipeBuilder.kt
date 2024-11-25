@@ -8,13 +8,17 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
- * Builds a 3x3 recipe
+ * Builds a size * size recipe
  *
  * @see buildRecipe
  */
-class RecipeBuilder {
+class RecipeBuilder(private val size: Int) {
 
-    private val recipe: Array<String> = Array(3) { " ".repeat(3) }
+    init {
+        require(size > 1) { "Recipe size must be greater than 1" }
+    }
+
+    private val recipe: Array<String> = Array(size) { " ".repeat(size) }
     private var row = 0
 
     private val charMap = Char2ObjectOpenHashMap<ItemStack?>().apply {
@@ -25,8 +29,8 @@ class RecipeBuilder {
      * Adds a recipe row
      */
     operator fun String.unaryPlus() {
-        require(length == 3) { "Recipe must be 3x3" }
-        require(row < 3) { "Recipe must be 3x3" }
+        require(length == size) { "Recipe must be ${size}x${size}" }
+        require(row < size) { "Recipe must be ${size}x${size}" }
         recipe[row++] = this
     }
 
@@ -50,7 +54,8 @@ class RecipeBuilder {
 }
 
 /**
- * Builds a 3x3 recipe as an [Array] of [ItemStack]s
+ * Builds a size * size recipe as an [Array] of [ItemStack]s.
+ * Default to 3*3.
  *
  * Example:
  * ```kotlin
@@ -65,9 +70,9 @@ class RecipeBuilder {
  * ```
  */
 @OptIn(ExperimentalContracts::class)
-inline fun buildRecipe(init: RecipeBuilder.() -> Unit): Array<out ItemStack?> {
+inline fun buildRecipe(size: Int = 3, init: RecipeBuilder.() -> Unit): Array<out ItemStack?> {
     contract {
         callsInPlace(init, InvocationKind.EXACTLY_ONCE)
     }
-    return RecipeBuilder().apply(init).build()
+    return RecipeBuilder(size).apply(init).build()
 }
