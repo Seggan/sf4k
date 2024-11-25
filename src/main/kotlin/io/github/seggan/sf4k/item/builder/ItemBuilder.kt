@@ -10,10 +10,8 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.ItemStack
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 import kotlin.properties.PropertyDelegateProvider
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 
 /**
@@ -58,6 +56,8 @@ class ItemBuilder(private val registry: ItemRegistry) {
 
     private val lore = mutableListOf<String>()
 
+    private var editItem: (SlimefunItemStack) -> SlimefunItemStack = { it }
+
     /**
      * Adds a line of lore, in [MiniMessage] format
      */
@@ -65,19 +65,25 @@ class ItemBuilder(private val registry: ItemRegistry) {
         lore += this.miniMessageToLegacy()
     }
 
-    fun <T : SlimefunItem> build(clazz: KClass<T>, vararg otherArgs: Any?): Pair<SlimefunItemStack, T> {
+    /**
+     * Edits the [SlimefunItemStack] after it is built
+     */
+    fun editItem(block: (SlimefunItemStack) -> SlimefunItemStack) {
+        editItem = block
+    }
+
+    fun <T : SlimefunItem> build(clazz: KClass<T>, vararg otherArgs: Any?): SlimefunItemStack {
         val sfi = SlimefunItemStack(
             id,
             material.convert(),
             name.miniMessageToLegacy().defaultLegacyColor('f'),
             *lore.map { it.defaultLegacyColor('7') }.toTypedArray()
         )
-        val args = arrayOf(category, sfi, recipeType, recipe, *otherArgs)
+        val args = arrayOf(category, editItem(sfi), recipeType, recipe, *otherArgs)
         val constructor = clazz.findConstructorFromArgs(*args)
             ?: error("No constructor found for ${clazz.simpleName} with arguments: ${args.joinToString()}")
-        val item = constructor.call(*args)
-        item.register(registry.addon)
-        return sfi to item
+        constructor.call(*args).register(registry.addon)
+        return sfi
     }
 }
 
@@ -86,7 +92,6 @@ class ItemBuilder(private val registry: ItemRegistry) {
  * The item **must** have a constructor `(ItemGroup, SlimefunItemStack, RecipeType, Array<out ItemStack>, ...)`.
  * Any extra arguments given to this function will be passed to the end of the item's
  * constructor.
- * The return value is intended to be used as a property delegate.
  *
  * Example:
  * ```kotlin
@@ -110,15 +115,15 @@ class ItemBuilder(private val registry: ItemRegistry) {
  * @param otherArgs any arguments to be passed to the item's constructor
  * @param builder the block to build with
  *
- * @return an [ItemProvider] for the built item
+ * @return a [PropertyDelegateProvider] for the item
  */
 inline fun <reified I : SlimefunItem> ItemRegistry.buildSlimefunItem(
     vararg otherArgs: Any?,
     crossinline builder: ItemBuilder.() -> Unit
-) = PropertyDelegateProvider<Any?, ItemProvider<I>> { _, property ->
+) = PropertyDelegateProvider<Any?, ReadOnlyProperty<Any?, SlimefunItemStack>> { _, property ->
     val itemBuilder = ItemBuilder(this)
     itemBuilder.id = property.name.uppercase()
     itemBuilder.apply(builder)
     val item = itemBuilder.build(I::class, *otherArgs)
-    ItemProvider(item.first, item.second)
+    ReadOnlyProperty { _, _ -> item }
 }
