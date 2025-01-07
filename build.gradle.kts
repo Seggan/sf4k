@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.seggan"
-version = "0.8.0"
+version = "0.8.1"
 description = "A simple library for creating Slimefun addons in Kotlin."
 
 repositories {
@@ -17,9 +17,11 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
+val slimefunDep = "com.github.Slimefun:Slimefun4:d12ae8580b"
+
 dependencies {
     compileOnlyApi("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    compileOnlyApi("com.github.Slimefun:Slimefun4:e02a0f61d1")
+    compileOnlyApi(slimefunDep)
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.19.0")
     api("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.19.0")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
@@ -27,7 +29,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("io.strikt:strikt-core:0.34.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.80.0")
-    testImplementation("com.github.Slimefun:Slimefun4:e02a0f61d1")
+    testImplementation(slimefunDep)
 }
 
 tasks.test {
